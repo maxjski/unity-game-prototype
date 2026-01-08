@@ -6,6 +6,7 @@ public class ClickToMove : MonoBehaviour
 {
     public NavMeshAgent agent;
     public float interactionDistance = 0.5f; // How close before showing UI
+    public GameObject clickIndicatorPrefab; // Drag the click indicator prefab here
 
     private InteractableItem targetItem;
     private bool isInteracting = false;
@@ -61,6 +62,9 @@ public class ClickToMove : MonoBehaviour
                     // We clicked the floor - clear target and move there
                     targetItem = null;
                     agent.SetDestination(hit.point);
+                    
+                    // Spawn click indicator
+                    SpawnClickIndicator(hit.point, hit.normal);
                 }
             }
         }
@@ -78,5 +82,18 @@ public class ClickToMove : MonoBehaviour
     public void ResumeMovement()
     {
         isInteracting = false;
+    }
+
+    void SpawnClickIndicator(Vector3 position, Vector3 normal)
+    {
+        if (clickIndicatorPrefab == null) return;
+        
+        // Spawn slightly above ground to avoid z-fighting
+        Vector3 spawnPos = position + normal * 0.01f;
+        
+        // Rotate to lie flat on the surface
+        Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal);
+        
+        Instantiate(clickIndicatorPrefab, spawnPos, rotation);
     }
 }
