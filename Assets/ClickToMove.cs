@@ -18,6 +18,13 @@ public class ClickToMove : MonoBehaviour
         {
             agent = GetComponent<NavMeshAgent>();
         }
+        
+        // Instant acceleration (no sliding)
+        if (agent != null)
+        {
+            agent.acceleration = 999f;
+            agent.angularSpeed = 999f; // Fast turning too
+        }
     }
 
     void Update()
@@ -69,12 +76,12 @@ public class ClickToMove : MonoBehaviour
                 {
                     // We clicked the floor - clear target and move there
                     targetItem = null;
-                    agent.SetDestination(hit.point);
+                agent.SetDestination(hit.point);
                     
                     // Spawn click indicator
                     SpawnClickIndicator(hit.point, hit.normal);
-                }
             }
+        }
         }
 
         // Check if we've arrived at an item's interaction point
