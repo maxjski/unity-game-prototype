@@ -7,6 +7,7 @@ public class ClickToMove : MonoBehaviour
     public NavMeshAgent agent;
     public float interactionDistance = 0.5f; // How close before showing UI
     public GameObject clickIndicatorPrefab; // Drag the click indicator prefab here
+    public LayerMask clickableLayers; // Set to "Ground" and "Interactable" layers
 
     private InteractableItem targetItem;
     private bool isInteracting = false;
@@ -38,8 +39,15 @@ public class ClickToMove : MonoBehaviour
             Ray ray = cam.ScreenPointToRay(mousePos);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit))
+            // Only detect objects on the specified layers
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, clickableLayers))
             {
+                Debug.Log($"HIT: '{hit.collider.gameObject.name}' | Layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)} | Position: {hit.point} | Collider type: {hit.collider.GetType().Name}");
+                
+                // Draw a debug line at hit point (visible in Scene view for 2 seconds)
+                Debug.DrawRay(hit.point, Vector3.up * 2f, Color.red, 2f);
+                Debug.DrawRay(hit.point, hit.normal * 1f, Color.green, 2f);
+                
                 InteractableItem item = hit.collider.GetComponent<InteractableItem>();
 
                 if (item != null)
@@ -80,6 +88,22 @@ public class ClickToMove : MonoBehaviour
 
     // Called by InteractableItem when the menu is closed
     public void ResumeMovement()
+    {
+        isInteracting = false;
+    }
+
+    // Called by Enemy when combat starts
+    public void EnterCombat()
+    {
+        isInteracting = true;
+        if (agent != null)
+        {
+            agent.ResetPath(); // Stop moving
+        }
+    }
+
+    // Called by Enemy when combat ends
+    public void ExitCombat()
     {
         isInteracting = false;
     }
