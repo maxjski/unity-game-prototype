@@ -26,7 +26,7 @@ public class InteractableItem : MonoBehaviour
     {
         // Close any other open item first
         if (currentlyOpen != null && currentlyOpen != this)
-        {
+    {
             currentlyOpen.CloseUI();
         }
         
